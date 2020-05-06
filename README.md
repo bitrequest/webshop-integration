@@ -28,7 +28,7 @@ For assistance visit [https://www.bitrequest.io/create-request-link/](https://ww
 #### 3. Checkout link.  
 Every link with class .br_checkout will trigger the payment terminal popup. Make sure the href attribute has the correctly formatted request link.
 
-    <a href="{$request_url}" target="_top" class="br_checkout">Check out</a>
+    <a href="{$request_url}" class="br_checkout">Check out</a>
 
 #### 4. Callback functions and post data.  
 When the websocket in the bitrequest App detects an incoming transaction, the transaction data will be posted to the parent of the iframe.
@@ -55,7 +55,8 @@ When the websocket in the bitrequest App detects an incoming transaction, the tr
         "data": {
            "t": "Example request title",
            "n": "Example request name",
-           "wh": "{webhook url}"
+           "c": 0,
+           "pid": "paymentid"
         },
         "meta": null
     }
