@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>Bitrequest Webshop integration</title>
+		<link rel="stylesheet" href="https://app.bitrequest.io/assets/styles/lib/bitrequest.css"/>
+	</head>
+	<body>
+		<h1>Bitrequest Webshop integration</h1>
+		<a href="" target="_top" class="br_checkout">Check out</a>
+		<script src="https://app.bitrequest.io/assets/js/lib/jquery-3.3.1.min.js"></script>
+		<script src="https://app.bitrequest.io/assets/js/lib/bitrequest_checkout.js"></script>
+		<script>
+			// Generate request url -> for assistance visit https://bitrequest.io/create-request-link/
+			var payment = 'nano';
+			var uoa = 'usd';
+			var amount = 0.05;
+			var address = 'nano_13kx8gfrse6q6z6djznkhj83cshih8akmjr3e3wmoabb38p6immo4mho8359';
+			var d = btoa(JSON.stringify({
+				't': 'Example request title',
+				'n': 'Example request name',
+				'c': 0,
+				'pid': "paymentid"
+			}));	
+			var request_url = 'https://app.bitrequest.io/?payment=' + payment + '&uoa=' + uoa + '&amount=' + amount + '&address=' + address + '&d=' + d;
+			
+			// Set request url
+			$(".br_checkout").attr("href", request_url);
+			
+			// overwrite callback function (from bitrequest_checkout.js)
+			function result_callback(post_data) {
+				console.log(post_data);
+				
+				// update backend (eg: database or emailnotification) and frontend
+				update_backend(post_data);
+				
+				// update frontend only
+				// update_frontend();
+			}
+			
+			function update_backend(post_data) { // callback function from bitrequest.js
+				console.log(post_data)
+				$.ajax({
+			        url: "webhook/index.php",
+			        cache: false,
+			        dataType: "json",
+			        method: "POST",
+			        data: post_data,
+					success: function(e){
+						console.log(e);
+						update_frontend();
+					},
+					timeout: 5000
+			    }).fail(function(e) {
+				    console.log(e);
+			    });
+			}
+			
+			function update_frontend() {
+				// close frame after payment is finished (from bitrequest_checkout.js)
+				closeframe();
+			}
+		</script>
+	</body>
+</html>
+	
