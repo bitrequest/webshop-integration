@@ -2,7 +2,7 @@
 Live demo: [https://www.bitrequest.io/webshop-prototype/](https://www.bitrequest.io/webshop-prototype/)
 
 ### Steps
-#### 1. Add the following resources to you html.
+#### 1. Add the following resources to your html.
     <link rel="stylesheet" href="https://app.bitrequest.io/assets/styles/lib/bitrequest.css"/>
     <script src="https://app.bitrequest.io/assets/js/lib/jquery-3.3.1.min.js"></script>
     <script src="https://app.bitrequest.io/assets/js/lib/bitrequest_checkout.js"></script>
