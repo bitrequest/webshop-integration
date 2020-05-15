@@ -1,5 +1,5 @@
 # Webshop integration  
-Live demo: [https://www.bitrequest.io/webshop-prototype/](https://www.bitrequest.io/webshop-prototype/)
+Live demo: [https://www.bitrequest.io/webshop-prototype/](https://www.bitrequest.io/brewery/)
 
 ### Steps
 #### 1. Add the following resources to your html.
@@ -11,7 +11,7 @@ You can skip the jquery file if you already use jquery on your site.
 Or you can use your own jquery reference instead.
 
 #### 2. Generate a request link (example).  
-For assistance visit [https://www.bitrequest.io/create-request-link/](https://www.bitrequest.io/create-request-link/)  
+For assistance visit [https://www.bitrequest.io/create-request-link/](https://www.bitrequest.io/request-url/)  
 
     var payment = 'nano';
     var uoa = 'usd';
@@ -21,7 +21,7 @@ For assistance visit [https://www.bitrequest.io/create-request-link/](https://ww
         't': 'Example request title',
         'n': 'Example request name',
         'c': 0,
-        'pid': "paymentid"
+        'pid': 'paymentid'
     }));
     var request_url = 'https://app.bitrequest.io/?payment=' + payment + '&uoa=' + uoa + '&amount=' + amount + '&address=' + address + '&d=' + d;
 

@@ -21,15 +21,13 @@
 	$value_string = ($iscrypto == "true") ? $ccval_string :
 		$ccval_string . " (" . $fiatvalue . " " . $currencyname . ")";
 		
-	$result = json_encode(array("result" => $json_object));
-	
 	// response email:
-	$recipient = "mail@bitrequest.io";
+	//$recipient = "example@domain.com"; // uncomment and enter you email address here
 	$subject = "You've received a new " . $payment . " payment";
 	$message = "<body style='margin:0;font-family:helvetica,arial,sans-serif;font-size:12px;color:#666;padding:20px'>
 			<p style='line-height:1.3em'>You have recieved " . $value_string . "<br/><br/>
 				<a href='https://app.bitrequest.io/?p=requests&txhash=" . $txhash . "' target='_blank'>View transaction</a><br/><br/>
-				<strong>post_data: </strong><br/><br/>" . $result . "
+				<strong>post_data: </strong><br/><br/>" . json_encode(array("result" => $json_object)) . "
 				</p>
 		</body>";
 	$headers = array(
@@ -39,7 +37,11 @@
 	    "Reply-To" => "mail@bitrequest.io",
 	    "X-Mailer" => "PHP/" . phpversion()
 	);
-	mail($recipient, $subject, $message, $headers);
-	
-	echo $result;
+	$mailresult = mail($recipient, $subject, $message, $headers);
+	if($mailresult) { 
+		$json_object["result"] = "success";
+	} else {
+	    $json_object["result"] = "error";
+	}
+	echo json_encode(array("result" => $json_object));
 ?>
