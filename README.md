@@ -23,6 +23,7 @@ For assistance visit [https://www.bitrequest.io/request-url/](https://www.bitreq
         'c': 0,
         'pid': 'paymentid'
     }));
+    // optional: set &contactform=true to show contact/shipping form
     var request_url = 'https://app.bitrequest.io/?payment=' + payment + '&uoa=' + uoa + '&amount=' + amount + '&address=' + address + '&d=' + d;
 
 #### 3. Checkout link.  
