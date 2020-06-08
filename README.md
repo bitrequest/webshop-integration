@@ -50,7 +50,8 @@ When the websocket in the bitrequest App detects an incoming transaction, the tr
            "txhash": "txhash",
            "receiver": "nano_13kx8gfrse6q6z6djznkhj83cshih8akmjr3e3wmoabb38p6immo4mho8359",
            "confirmations": "false",
-           "transactiontime": "1588660654471"
+           "transactiontime": "1588660654471",
+           "pending": "polling"
         },
         "data": {
            "t": "Example request title",
