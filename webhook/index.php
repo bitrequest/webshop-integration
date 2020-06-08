@@ -15,7 +15,7 @@
 		"txdata" => $txdata,
 		"data" => $_POST["data"],
 		"meta" => $_POST["meta"],
-		"meta" => $contactdetails
+		"contact" => $contactdetails
 	);
 	
 	$ccval_string = $ccvalue . " " . $payment;
