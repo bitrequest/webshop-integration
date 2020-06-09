@@ -8,14 +8,17 @@
     $fiatvalue = $txdata["fiatvalue"];
 	$txhash = $txdata["txhash"];
 	$iscrypto = $txdata["iscrypto"];
-	$contactdetails = $_POST["contact"];
+	
+	$data = $_POST["data"];
+	$meta = $_POST["meta"];
+	$contact = $_POST["contact"];
     
     // response json:
 	$json_object = array(
 		"txdata" => $txdata,
-		"data" => $_POST["data"],
-		"meta" => $_POST["meta"],
-		"contact" => $contactdetails
+		"data" => $data,
+		"meta" => $meta,
+		"contact" => $contact
 	);
 	
 	$ccval_string = $ccvalue . " " . $payment;
@@ -44,8 +47,9 @@
 	    "Reply-To" => $sender,
 	    "X-Mailer" => "PHP/" . phpversion()
 	);
-	if($contactdetails !== NULL) {
-		mail($contactdetails["email"], "Thank you for your purchase", $message, $headers);
+	if($contact !== NULL) {
+		$confirm_subject = "Thank you for your purchase at " . $data["n"];
+		mail($contact["email"], $confirm_subject, $message, $headers);
 	}
 	$mailresult = mail($recipient, $subject, $message, $headers);
 	if($mailresult) { 
