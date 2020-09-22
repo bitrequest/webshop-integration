@@ -5,8 +5,7 @@ header("Content-Type: application/json");
 $host = $_SERVER["HTTP_HOST"];
 $origin = $_SERVER["HTTP_ORIGIN"];
 $post_origin = (strpos($origin, $host)) ? "local" : "remote"; // check if post request is local or remote
-if ($post_origin == "local")
-{ // only allow local requests
+if ($post_origin == "local") { // only allow local requests
     $security_object = array(
         "host" => $host,
         "origin" => $origin,
@@ -61,26 +60,22 @@ if ($post_origin == "local")
         "Reply-To" => $sender,
         "X-Mailer" => "PHP/" . phpversion()
     );
-    if ($contact !== NULL)
-    {
+    if ($contact !== NULL) {
         $confirm_subject = "Thank you for your purchase at " . $data["n"];
         mail($contact["email"], $confirm_subject, $message, $headers);
     }
     $mailresult = mail($recipient, $subject, $message, $headers);
-    if ($mailresult)
-    {
+    if ($mailresult) {
         $json_object["status"] = "success";
     }
-    else
-    {
+    else {
         $json_object["status"] = "error";
     }
     echo json_encode(array(
         "result" => $json_object
     ) , JSON_PRETTY_PRINT);
 }
-else
-{
+else {
     $json_object = array(
         "status" => "error",
         "message" => "cross origin not allowed"

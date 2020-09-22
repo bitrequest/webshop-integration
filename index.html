@@ -58,7 +58,9 @@
 
         function update_frontend() {
             // close frame after payment is finished (from bitrequest_checkout.js)
-            closeframe();
+            setTimeout(function() {
+				closeframe();
+			}, 2500);
         }
     </script>
 </body>
