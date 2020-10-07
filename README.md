@@ -1,4 +1,4 @@
-# Webshop integration  
+# Webshop integration (Beta)  
 Live demo: [https://www.bitrequest.io/brewery/](https://www.bitrequest.io/brewery/)
 
 ### Steps
