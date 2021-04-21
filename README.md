@@ -3,9 +3,9 @@ Live demo: [https://www.bitrequest.io/brewery/](https://www.bitrequest.io/brewer
 
 ### Steps
 #### 1. Add the following resources to your html.
-    <link rel="stylesheet" href="https://app.bitrequest.io/assets/styles/lib/bitrequest.css"/>
-    <script src="https://app.bitrequest.io/assets/js/lib/jquery-3.3.1.min.js"></script>
-    <script src="https://app.bitrequest.io/assets/js/lib/bitrequest_checkout.js"></script>
+    <link rel="stylesheet" href="https://bitrequest.github.io/assets/styles/lib/bitrequest.css"/>
+    <script src="https://bitrequest.github.io/assets/js/lib/jquery-3.3.1.min.js"></script>
+    <script src="https://bitrequest.github.io/assets/js/lib/bitrequest_checkout.js"></script>
 
 You can skip the jquery file if you already use jquery on your site.  
 Or you can use your own jquery reference instead.
@@ -24,7 +24,7 @@ For assistance visit [https://www.bitrequest.io/request-url/](https://www.bitreq
         'pid': 'paymentid'
     }));
     // optional: set &contactform=true to show contact/shipping form
-    var request_url = 'https://app.bitrequest.io/?payment=' + payment + '&uoa=' + uoa + '&amount=' + amount + '&address=' + address + '&d=' + d;
+    var request_url = 'https://bitrequest.github.io/?payment=' + payment + '&uoa=' + uoa + '&amount=' + amount + '&address=' + address + '&d=' + d;
 
 #### 3. Checkout link.  
 Every link with class .br_checkout will trigger the payment terminal popup. Make sure the href attribute has the correctly formatted request link.

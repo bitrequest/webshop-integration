@@ -50,7 +50,7 @@ if ($post_origin == "local") { // only allow local requests
 				<strong>Purchased</strong> " . $_POST["data"]["t"] . "<br/><br/>
 				<strong>post_data: </strong><br/>
 				<pre>" . $post_data . "</pre><br/>
-				<a href='https://app.bitrequest.io/?p=requests&txhash=" . $txhash . "' target='_blank'>View transaction</a>
+				<a href='https://bitrequest.github.io/?p=requests&txhash=" . $txhash . "' target='_blank'>View transaction</a>
 			</p>
 		</body>";
     $headers = array(
