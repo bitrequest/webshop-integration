@@ -3,9 +3,9 @@ Live demo: [https://www.bitrequest.io/brewery/](https://www.bitrequest.io/brewer
 
 ### Steps
 #### 1. Add the following resources to your html.
-    <link rel="stylesheet" href="https://bitrequest.github.io/assets/styles/lib/bitrequest.css"/>
-    <script src="https://bitrequest.github.io/assets/js/lib/jquery-3.3.1.min.js"></script>
-    <script src="https://bitrequest.github.io/assets/js/lib/bitrequest_checkout.js"></script>
+    <link rel="stylesheet" href="https://bitrequest.github.io/assets_styles_lib_bitrequest.css"/>
+    <script src="https://bitrequest.github.io/assets_js_lib_jquery-3.3.1.min.js"></script>
+    <script src="https://bitrequest.github.io/assets_js_lib_bitrequest_checkout.js"></script>
 
 You can skip the jquery file if you already use jquery on your site.  
 Or you can use your own jquery reference instead.
