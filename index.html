@@ -21,7 +21,7 @@
         }));
         
         // optional: set &contactform=true to show contact/shipping form
-        const request_url = "https://bitrequest.github.io/?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
+        const request_url = base_url + "?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
         
         // Set request url
         document.querySelector(".br_checkout").setAttribute("href", request_url);
