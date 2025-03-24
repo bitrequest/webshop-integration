@@ -1,4 +1,9 @@
 <?php
+	// Allow requests from any origin
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
 $host = $_SERVER["HTTP_HOST"];
 $post_data = json_encode(array(
     "post" => $_POST,

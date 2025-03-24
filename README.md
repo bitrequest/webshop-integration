@@ -1,4 +1,4 @@
-# Bitrequest Webshop Integration (Beta) 🛍️
+# Bitrequest Webshop Integration 🛍️
 
 > A simple way to integrate cryptocurrency payments into your webshop
 
