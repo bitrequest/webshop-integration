@@ -8,36 +8,62 @@
     <a href="" target="_top" class="br_checkout">Check out</a>
     <script src="https://bitrequest.github.io/assets_js_lib_bitrequest_checkout.js"></script>
     <script>
+        // Set webhook url to update backend (eg: database or email notification)
+        const webhook = "webhook/index.php";
+        
         // Generate request url -> for assistance visit https://bitrequest.io/create-request-link/
         const payment = "nano";
         const uoa = "usd";
         const amount = 0.05;
-        const address = "nano_13kx8gfrse6q6z6djznkhj83cshih8akmjr3e3wmoabb38p6immo4mho8359";
+        const address = "nano_3ag4rxc33ok53no7rimms94u19duqooctrdgnxmztzhdh6aoms6kknr7h8fb"; // bitrequest representative address as a placeholder, change to your own address
         const d = btoa(JSON.stringify({
             "t": "Example request title",
             "n": "Example request name",
             "c": 0,
             "pid": "paymentid"
         }));
-        
         // optional: set &contactform=true to show contact/shipping form
-        const request_url = base_url + "?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
+        const request_url = b_url + "?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
         
         // Set request url
         document.querySelector(".br_checkout").setAttribute("href", request_url);
-        
-        // overwrite callback function (from bitrequest_checkout.js)
+        // overwrite callback function (from assets_js_lib_bitrequest_checkout.js)
         function result_callback(post_data) {
             console.log(post_data);
         
-            // update backend (eg: database or emailnotification) and frontend
+            // update backend (eg: database or email notification) and frontend
             update_backend(post_data);
         
             // update frontend only
             // update_frontend();
         }
         
-        function update_backend(post_data) { // callback function from bitrequest.js
+        function update_backend(post_data) {
+            try {
+                // Use Jquery Ajax if available
+                update_backend_jquery(post_data);
+            } catch (err) {
+                // Use native fetch instead
+                update_backend_native(post_data);
+            }
+        }
+        
+        function update_backend_jquery(post_data) {
+            $.ajax({
+                "method": "POST",
+                "cache": false,
+                "timeout": 5000,
+                "url": webhook,
+                "data": post_data
+            }).done(function(e) {
+                console.log(e);
+                update_frontend();
+            }).fail(function(e) {
+                console.error(e);
+            });
+        }
+        
+        function update_backend_native(post_data) {
             // Convert nested object to form data with array notation
             const formData = new URLSearchParams();
         
@@ -53,8 +79,7 @@
         
             // Add meta field
             formData.append("meta", post_data.meta || "");
-        
-            fetch("webhook/index.php", {
+            fetch(webhook, {
                     "method": "POST",
                     "headers": {
                         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
@@ -69,12 +94,11 @@
                     update_frontend();
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error(error);
                 });
         }
         
         function update_frontend() {
-            // close frame after payment is finished (from bitrequest_checkout.js)
             setTimeout(function() {
                 closeframe();
             }, 2500);
