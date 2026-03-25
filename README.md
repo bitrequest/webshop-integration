@@ -12,7 +12,7 @@
 *   **Multi-Currency Support**: Handles Bitcoin, Lightning, Nano, Litecoin, Dogecoin, Dash, Ethereum + ERC20/L2, Bitcoin-cash, Monero, Nimiq, and Kaspa.
 *   **Secure & Lightweight**: Uses iframes with sandboxing, origin checks for postMessage, and minimal dependencies.
 *   **Callbacks for Transactions**: Receive real-time updates on payments via JavaScript callbacks.
-*   **Lightning Network Ready**: Proxy support for LN payments with popular implementations (LND, LNbits, etc.).
+*   **Lightning Network Ready**: Proxy support for LN payments with popular implementations (LND, Core-lightning, LNbits, Spark, NWC).
 *   **Customizable**: Add contact forms, metadata, and handle backend updates seamlessly.
 
 ### **Requirements**
@@ -111,7 +111,7 @@ function result_callback(post_data) {
 
 ### **Lightning Network Support ⚡**
 
-For Lightning payments, set up a [proxy server](https://github.com/bitrequest/bitrequest.github.io/tree/master/proxy) connected to your LN node (e.g., LND, LNbits).
+For Lightning payments, set up a [proxy server](https://github.com/bitrequest/bitrequest.github.io/tree/master/proxy) connected to your LN node (LND, Core-lightning, LNbits, Spark, NWC).
 
 **Lightning Configuration**
 
@@ -126,7 +126,7 @@ const d = btoa(JSON.stringify({
     "n": "Example request name",
     "c": 1,
     "pid": "{$random payment-id}",  // required
-    "imp": "lnd",  // or "c-lightning" / "lnbits"
+    "imp": "lnd",  // or "c-lightning" / "lnbits" / "spark" / "nwc"
     "proxy": "{$proxy host}",  // url or lnurl (required)
     "pw": "{$your proxy api key}"  // optional
 }));
