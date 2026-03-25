@@ -64,38 +64,32 @@
         }
         
         function update_backend_native(post_data) {
-            // Convert nested object to form data with array notation
             const formData = new URLSearchParams();
-        
-            // Add txdata fields
-            Object.entries(post_data.txdata || {}).forEach(([key, value]) => {
-                formData.append("txdata[" + key + "]", value);
+            Object.entries(post_data).forEach(([key, value]) => {
+                if (typeof value === "object" && value !== null) {
+                    Object.entries(value).forEach(([subkey, subvalue]) => {
+                        formData.append(key + "[" + subkey + "]", subvalue);
+                    });
+                } else {
+                    formData.append(key, value || "");
+                }
             });
-        
-            // Add data fields
-            Object.entries(post_data.data || {}).forEach(([key, value]) => {
-                formData.append("data[" + key + "]", value);
-            });
-        
-            // Add meta field
-            formData.append("meta", post_data.meta || "");
             fetch(webhook, {
-                    "method": "POST",
-                    "headers": {
-                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-                    },
-                    "body": formData.toString(),
-                    "cache": "no-cache",
-                    "timeout": 5000
-                })
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data);
-                    update_frontend();
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                },
+                "body": formData.toString(),
+                "cache": "no-cache"
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                update_frontend();
+            })
+            .catch(error => {
+                console.error(error);
+            });
         }
         
         function update_frontend() {
