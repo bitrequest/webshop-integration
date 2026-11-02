@@ -1,101 +1,74 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bitrequest Webshop integration</title>
-    <link rel="stylesheet" href="https://bitrequest.github.io/assets_styles_lib_bitrequest.css" />
+    <link rel="stylesheet" href="https://bitrequest.github.io/assets_styles_lib_bitrequest.css">
 </head>
 <body>
     <h1>Bitrequest Webshop integration</h1>
     <a href="" target="_top" class="br_checkout">Check out</a>
     <script src="https://bitrequest.github.io/assets_js_lib_bitrequest_checkout.js"></script>
     <script>
-        // Set webhook url to update backend (eg: database or email notification)
+        // Sends you an e-mail notification (see webhook/index.php)
         const webhook = "webhook/index.php";
-        
-        // Generate request url -> for assistance visit https://bitrequest.io/create-request-link/
+
+        // Generate request url -> for assistance visit https://www.bitrequest.io/request-url/
         const payment = "nano";
         const uoa = "usd";
         const amount = 0.05;
         const address = "nano_3ag4rxc33ok53no7rimms94u19duqooctrdgnxmztzhdh6aoms6kknr7h8fb"; // bitrequest representative address as a placeholder, change to your own address
-        const d = btoa(JSON.stringify({
+        const d = b64encode_json({
             "t": "Example request title",
             "n": "Example request name",
             "c": 0,
-            "pid": "paymentid"
-        }));
+            "pid": "order-1001" // your order id, unique per order
+        });
         // optional: set &contactform=true to show contact/shipping form
-        const request_url = b_url + "?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
-        
-        // Set request url
+        const request_url = "https://bitrequest.github.io/?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
+
         document.querySelector(".br_checkout").setAttribute("href", request_url);
-        // overwrite callback function (from assets_js_lib_bitrequest_checkout.js)
+
+        // UTF-8 safe, URL-safe base64 (same encoding as the app's b64encode_url)
+        function b64encode_json(obj) {
+            const bytes = new TextEncoder().encode(JSON.stringify(obj));
+            let binary = "";
+            for (const byte of bytes) {
+                binary += String.fromCharCode(byte);
+            }
+            return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_");
+        }
+
+        // Overrides the placeholder in assets_js_lib_bitrequest_checkout.js.
+        // Called on every status change (pending, paid, insufficient). This is a UX signal,
+        // not proof of payment: confirm the payment in your wallet before you ship.
         function result_callback(post_data) {
             console.log(post_data);
-        
-            // update backend (eg: database or email notification) and frontend
-            update_backend(post_data);
-        
-            // update frontend only
-            // update_frontend();
-        }
-        
-        function update_backend(post_data) {
-            try {
-                // Use Jquery Ajax if available
-                update_backend_jquery(post_data);
-            } catch (err) {
-                // Use native fetch instead
-                update_backend_native(post_data);
+            notify_backend(post_data);
+            if (post_data?.txdata?.status === "paid") {
+                setTimeout(closeframe, 2500);
             }
         }
-        
-        function update_backend_jquery(post_data) {
-            $.ajax({
-                "method": "POST",
-                "cache": false,
-                "timeout": 5000,
-                "url": webhook,
-                "data": post_data
-            }).done(function(e) {
-                console.log(e);
-                update_frontend();
-            }).fail(function(e) {
-                console.error(e);
-            });
-        }
-        
-        function update_backend_native(post_data) {
-            const formData = new URLSearchParams();
-            Object.entries(post_data).forEach(([key, value]) => {
-                if (typeof value === "object" && value !== null) {
-                    Object.entries(value).forEach(([subkey, subvalue]) => {
-                        formData.append(key + "[" + subkey + "]", subvalue);
-                    });
-                } else {
-                    formData.append(key, value || "");
-                }
-            });
+
+        function notify_backend(post_data) {
             fetch(webhook, {
                 "method": "POST",
                 "headers": {
-                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    "Content-Type": "application/json"
                 },
-                "body": formData.toString(),
-                "cache": "no-cache"
+                "body": JSON.stringify(post_data),
+                "cache": "no-store"
             })
-            .then(response => response.text())
-            .then(data => {
-                console.log(data);
-                update_frontend();
-            })
+            .then(response => response.json().then(body => {
+                if (!response.ok) {
+                    throw new Error(response.status + " " + body.message);
+                }
+                console.log(body);
+            }))
             .catch(error => {
-                console.error(error);
+                console.error("webhook:", error);
             });
-        }
-        
-        function update_frontend() {
-            setTimeout(function() {
-                closeframe();
-            }, 2500);
         }
     </script>
 </body>
