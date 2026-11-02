@@ -29,6 +29,9 @@ function clean($value, $max = 200) {
 	if (is_bool($value)) {
 		return $value ? "true" : "false";
 	}
+	if (is_float($value)) {
+		$value = rtrim(rtrim(sprintf("%.8F", $value), "0"), "."); // avoid "5.0E-6"
+	}
 	if (!is_scalar($value)) {
 		return "";
 	}
