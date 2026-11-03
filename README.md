@@ -1,4 +1,4 @@
-### **Bitrequest Webshop Integration 🛍️**
+### **Bitrequest Webshop Integration**
 
 > A simple way to integrate cryptocurrency payments into your webshop
 
@@ -13,18 +13,13 @@
 *   **Secure & Lightweight**: Sandboxed iframe, exact origin checks for postMessage, no dependencies.
 *   **Callbacks for Transactions**: Receive real-time updates on payments via JavaScript callbacks.
 *   **Lightning Network Ready**: Proxy support for LN payments with popular implementations (LND, Core-lightning, LNbits, Spark, NWC).
-*   **Customizable**: Add contact forms, metadata, and e-mail notifications.
-
-### **⚠️ The callback is not proof of payment**
-Bitrequest is non-custodial: the checkout watches the blockchain from your customer's browser. The result callback is a signal from that browser, and anyone can trigger it with made-up data (the browser console is enough).
-
-**Before you ship an order, confirm the payment in your wallet** (transaction, receiving address, amount, confirmations), or verify it against your own node. For a small shop, checking your wallet before fulfilling is a perfectly good way to run. Use the callback to update the page and to notify yourself, never to mark an order as paid.
+*   **Customizable**: Add contact forms, metadata, and handle backend updates seamlessly.
 
 ### **Requirements**
 *   A modern browser with JavaScript enabled.
-*   Any web server for your shop. Static sites like GitHub Pages work fine for the checkout itself.
-*   Optional: PHP with `mail()` for the notification webhook.
-*   For Lightning: a self-hosted proxy server connected to your node (see below).
+*   Access to a web server for hosting your shop (static sites like GitHub Pages work fine).
+*   For Lightning: A self-hosted proxy server connected to your node (see below).
+*   No server-side changes are needed for the basic setup, but a backend (e.g., PHP) is recommended for transaction handling.
 
 ### **Quick Start Guide**
 
@@ -39,7 +34,7 @@ Include the stylesheet and script in your HTML `<head>` or before the closing `<
 
 **2. Generate Request Link**
 
-Use the [Request URL Generator](https://www.bitrequest.io/request-url/) for help building URLs, and see [Request parameters](#request-parameters) below.
+Use the [Request URL Generator](https://www.bitrequest.io/request-url/) for help building URLs. All options are listed under [Request parameters](#request-parameters).
 
 ```javascript
 const payment = "nano";
@@ -55,29 +50,22 @@ const d = b64encode_json({
 
 // Create request URL (optional: add &contactform=true for shipping details)
 const request_url = "https://bitrequest.github.io/?payment=" + payment + "&uoa=" + uoa + "&amount=" + amount + "&address=" + address + "&d=" + d;
-
-// UTF-8 safe, URL-safe base64. Plain btoa() throws on characters like € or 中.
-function b64encode_json(obj) {
-    const bytes = new TextEncoder().encode(JSON.stringify(obj));
-    let binary = "";
-    for (const byte of bytes) {
-        binary += String.fromCharCode(byte);
-    }
-    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_");
-}
 ```
 
 **3. Add Checkout Button**
 
-Trigger the payment popup with a link that has the `br_checkout` class:
+Give a link the `br_checkout` class:
 ```html
 <a href="https://bitrequest.github.io/?payment=..." class="br_checkout">Check out</a>
 ```
-The script handles clicks on `.br_checkout` elements (including clicks on icons or other elements inside them), validates the URL and opens it in a sandboxed iframe.
+Clicking it opens the payment popup.
 
 **4. Handle Transaction Callbacks**
 
-When the checkout detects a transaction it posts the data to your page via `postMessage`. The script checks the message origin and calls `result_callback`. It is called on every status change: `pending` (transaction seen, waiting for the confirmations set with `c`), `paid` and `insufficient` (amount too low; the customer can still top up).
+When the checkout detects a transaction, it sends the data to your page and calls `result_callback`. This happens on every status change:
+*   `pending`: transaction seen, waiting for the confirmations set with `c`.
+*   `paid`: payment complete.
+*   `insufficient`: amount too low; the customer can still top up.
 
 **Example Post Data**:
 ```json
@@ -120,7 +108,7 @@ When the checkout detects a transaction it posts the data to your page via `post
 
 **5. Implement Callback Function**
 
-Define `result_callback` anywhere on your page. It overrides the placeholder in the script, whatever the load order:
+Define `result_callback` anywhere on your page (load order doesn't matter):
 ```javascript
 function result_callback(post_data) {
     // update your page, notify your backend
@@ -129,24 +117,20 @@ function result_callback(post_data) {
     }
 }
 ```
-Only close the popup on `paid`. Closing it on `pending` stops the checkout before the payment is confirmed, and on `insufficient` it takes away the customer's chance to top up.
+Close the popup on `paid` only, so it keeps watching while a payment is `pending` and the customer can top up when it is `insufficient`.
+
+Before you go live, read [SECURITY.md](SECURITY.md) on how to verify payments.
 
 ### **Notification Webhook (optional)**
 
-[`webhook/index.php`](webhook/index.php) e-mails you each result that [`index.html`](index.html) posts to it. It is a **notification, not verification**: every mail from the browser is marked `UNVERIFIED`.
+[`webhook/index.php`](webhook/index.php) e-mails you each payment update that [`index.html`](index.html) posts to it.
 
 1.  Copy `webhook/` to your PHP server.
 2.  Set `RECIPIENT` and `SENDER` (an address on your own domain) at the top of `webhook/index.php`.
 3.  Post results to it as JSON, see `notify_backend()` in [`index.html`](index.html).
 4.  Shop on a different domain than the webhook (e.g. GitHub Pages)? Add the shop's origin to `ALLOWED_ORIGINS`, e.g. `["https://yourshop.github.io"]`.
 
-Test from a served page, not a local file: a `file://` page sends `Origin: null`, which is always refused (any website can produce it), so its preflight fails with a 405.
-
-Built-in abuse protection:
-*   `POST` with a JSON body only, from your own origin (or `ALLOWED_ORIGINS`) only. Other websites can't make visitors' browsers post to it: JSON requires a CORS preflight, which the webhook only answers for allowed origins, and the `Origin` header is checked.
-*   16 KB body limit. Only known fields are read, and they are mailed as plain text, so no HTML or header injection.
-*   The same notification is mailed only once.
-*   Unverified notifications are capped at 20 per hour (`MAX_MAILS_PER_HOUR`). Someone can use up that cap to suppress unverified mails for an hour, which is one more reason your wallet is the source of truth.
+Test from a served page, not a local file: requests from `file://` pages are refused (the preflight fails with a 405).
 
 ### **Lightning Network Support ⚡**
 
@@ -171,20 +155,16 @@ const d = b64encode_json({
 });
 ```
 
-> ⚠️ `pw` ends up in your page source, so every visitor can read it. It keeps casual traffic off your proxy; don't reuse it as a secret anywhere else.
+**Server-side callbacks (optional)**
 
-**Server-side callbacks**
-
-Your proxy can post invoice updates straight to your server via `callback_url` in the [proxy config file](https://github.com/bitrequest/bitrequest.github.io/tree/master/proxy). Unlike the browser callback, this comes from your own node. To use it with the webhook:
+Your proxy can also post invoice updates straight to the webhook:
 
 1.  Set `CALLBACK_TOKEN` in `webhook/index.php` to 32+ random characters (e.g. `openssl rand -hex 32`).
 2.  In the proxy's `config.php`, set `"callback_url" => "https://yourshop.com/webhook/?token=<CALLBACK_TOKEN>"`.
 
-Token-checked callbacks are not marked unverified and are exempt from the hourly cap. The invoice amount is requested by the checkout in the customer's browser, so still check `amount_paid` (msat) against the order. The proxy reports a paid invoice when its status is checked, which the checkout does while it is open. Don't treat a missing callback as "not paid".
-
 ### **Monero**
 
-To detect Monero payments, the checkout needs your private viewkey: add it as `vk` in `d`. Without it the payment isn't detected. The viewkey is then readable in your page source and reveals every incoming payment to that address (it can't spend), so use a dedicated account for your shop.
+To detect Monero payments, add your private viewkey as `vk` in `d`. Without it the payment isn't detected. Read [SECURITY.md](SECURITY.md#monero-viewkey) before you do.
 
 ### **Request parameters**
 
@@ -211,24 +191,7 @@ To detect Monero payments, the checkout needs your private viewkey: add it as `v
 | `pid` | Your order id, returned as `data.pid`. Unique per order; required for Lightning. |
 | `l2` | ERC-20 on a layer 2: `[0]` Arbitrum One, `[1]` Polygon PoS, `[2]` BNB Smart Chain, `[3]` Base. |
 | `vk` | Monero private viewkey, see [Monero](#monero). |
-| `imp`, `proxy`, `pw` | Lightning, see [Lightning](#lightning-network-support-). |
-
-### **Content Security Policy**
-
-If your shop sends a CSP, allow the script, the stylesheet and the iframe, plus `connect-src 'self'` for the webhook:
-```
-script-src 'self' https://bitrequest.github.io; style-src 'self' https://bitrequest.github.io; frame-src https://bitrequest.github.io; connect-src 'self'
-```
-Inline scripts like the example in `index.html` also need a nonce or hash.
-
-### **Self-hosting the script**
-
-To avoid loading a third-party script on your checkout page, copy `assets_js_lib_bitrequest_checkout.js` and `assets_styles_lib_bitrequest.css` to your own server and tell the script where the app lives:
-```html
-<link rel="stylesheet" href="/js/assets_styles_lib_bitrequest.css"/>
-<script src="/js/assets_js_lib_bitrequest_checkout.js" data-origin="https://bitrequest.github.io"></script>
-```
-Without `data-origin`, the script assumes the app is served from the same origin as the script (for self-hosted Bitrequest instances) and rejects `bitrequest.github.io` links. Updates to the script are then up to you.
+| `imp`, `proxy`, `pw` | Lightning, see [Lightning](#lightning-network-support). |
 
 ### **Resources**
 *   [Live Demo](https://www.bitrequest.io/brewery/)
