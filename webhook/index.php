@@ -158,6 +158,7 @@ if (isset($_GET["token"])) {
 	if (isset($payload["meta"])) {
 		$lines[] = "Meta: " . clean(json_encode($payload["meta"], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), 500);
 	}
+	$lines[] = "Origin: " . clean(parse_url($origin, PHP_URL_HOST) ?: "", 253);
 	$lines[] = "Sender IP: " . clean($_SERVER["REMOTE_ADDR"] ?? "", 45);
 	$dedupe_key = "web|" . $pid . "|" . $status . "|" . $txhash;
 }
